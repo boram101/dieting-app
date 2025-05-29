@@ -36,7 +36,7 @@ def load_log():
  try:
   with open("meals_log.json", "r") as f:
    return json.load(f)
-   except:
+   except: 
     return {}
 
 #-------------------- 식사 기록 저장 -------------------- 
