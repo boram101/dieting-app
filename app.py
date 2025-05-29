@@ -32,7 +32,12 @@ def get_calorie_goal(bmr, goal):
 
 #-------------------- 식사 기록 불러오기 -------------------- 
 
-def load_log(): try: with open("meals_log.json", "r") as f: return json.load(f) except: return {}
+def load_log():
+ try:
+  with open("meals_log.json", "r") as f:
+   return json.load(f)
+   except:
+    return {}
 
 #-------------------- 식사 기록 저장 -------------------- 
 
