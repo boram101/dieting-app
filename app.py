@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 st.set_page_config(page_title="개인 맞춤 식단 설계 프로그램")
 st.title("🥗 개인 맞춤 식단 설계 프로그램")
 
-# -------------------- 데이터 구조 --------------------
+# -------------------- 음식 데이터 --------------------
 foods = [
     {"name": "닭가슴살", "calories": 165, "protein": 31, "allergens": []},
     {"name": "현미밥", "calories": 220, "protein": 4, "allergens": []},
@@ -15,6 +15,8 @@ foods = [
     {"name": "우유", "calories": 150, "protein": 8, "allergens": ["우유"]},
     {"name": "계란", "calories": 70, "protein": 6, "allergens": ["달걀"]},
     {"name": "사과", "calories": 52, "protein": 0.3, "allergens": []},
+    {"name": "오트밀", "calories": 68, "protein": 2.4, "allergens": []},
+    {"name": "그릭요거트", "calories": 100, "protein": 10, "allergens": ["우유"]},
 ]
 
 # -------------------- BMR 계산 --------------------
@@ -38,9 +40,7 @@ def load_log():
     try:
         with open("meals_log.json", "r") as f:
             return json.load(f)
-    except FileNotFoundError:
-        return {}
-    except json.JSONDecodeError:
+    except (FileNotFoundError, json.JSONDecodeError):
         return {}
 
 # -------------------- 식사 기록 저장 --------------------
@@ -69,7 +69,7 @@ bmr = calculate_bmr(gender, weight, height, age)
 calorie_goal = get_calorie_goal(bmr, goal)
 st.markdown(f"### 🧮 하루 권장 섭취 칼로리: {int(calorie_goal)} kcal")
 
-# -------------------- 식단 추천 --------------------
+# -------------------- 추천 식단 --------------------
 st.markdown("### 🥗 추천 식단 (알레르기 고려)")
 recommended = [f for f in foods if not any(a in f["allergens"] for a in allergies)]
 for food in recommended:
@@ -96,12 +96,11 @@ st.markdown("### 🍽️ 오늘 하루 먹은 음식")
 meal_names = [f["name"] for f in foods]
 selected_meals = st.multiselect("음식 선택", meal_names)
 
-manual_meal = st.text_input("직접 입력한 음식 (칼로리 계산 X)", placeholder="예: 치킨, 짜장면")
+manual_meal = st.text_input("직접 입력한 음식 (칼로리 계산에 포함되지 않음)", placeholder="예: 치킨, 떡볶이")
 if manual_meal:
     selected_meals.append(manual_meal.strip())
 
 if st.button("📊 칼로리 계산 및 저장"):
-    # 칼로리는 foods에 정의된 음식만 계산
     intake = sum(f["calories"] for f in foods if f["name"] in selected_meals)
     st.success(f"오늘 총 섭취 칼로리: {intake} kcal")
 
