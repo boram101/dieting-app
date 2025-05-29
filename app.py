@@ -14,11 +14,21 @@ foods = [ {"name": "닭가슴살", "calories": 165, "protein": 31, "allergens": 
 
 #-------------------- BMR 계산 -------------------- 
 
-def calculate_bmr(gender, weight, height, age): if gender == "남성": return 10 * weight + 6.25 * height - 5 * age + 5 else: return 10 * weight + 6.25 * height - 5 * age - 161
+def calculate_bmr(gender, weight, height, age): 
+if gender == "남성": 
+  return 10 * weight + 6.25 * height - 5 * age + 5
+else: 
+  return 10 * weight + 6.25 * height - 5 * age - 161
 
 #-------------------- 목표별 칼로리 -------------------- 
 
-def get_calorie_goal(bmr, goal): if goal == "다이어트": return bmr - 300 elif goal == "근육 증가": return bmr + 300 else: return bmr
+def get_calorie_goal(bmr, goal): 
+if goal == "다이어트": 
+  return bmr - 300 
+elif goal == "근육 증가": 
+  return bmr + 300 
+else: 
+  return bmr
 
 #-------------------- 식사 기록 불러오기 -------------------- 
 
