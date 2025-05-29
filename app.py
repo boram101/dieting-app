@@ -38,7 +38,9 @@ def load_log():
     try:
         with open("meals_log.json", "r") as f:
             return json.load(f)
-    except:
+    except FileNotFoundError:
+        return {}
+    except json.JSONDecodeError:
         return {}
 
 # -------------------- 식사 기록 저장 --------------------
@@ -53,19 +55,14 @@ age = st.sidebar.number_input("나이", min_value=10, max_value=100, value=25)
 gender = st.sidebar.selectbox("성별", ["남성", "여성"])
 height = st.sidebar.number_input("키 (cm)", min_value=100, max_value=250, value=170)
 weight = st.sidebar.number_input("몸무게 (kg)", min_value=30, max_value=200, value=70)
+
 allergies = st.sidebar.multiselect("알레르기", ["우유", "콩", "달걀"])
+custom_allergy = st.sidebar.text_input("기타 알레르기 성분 입력", placeholder="예: 생선, 견과류")
+if custom_allergy:
+    allergies.append(custom_allergy.strip())
+
 health = st.sidebar.text_input("건강 상태", placeholder="예: 고혈압")
 goal = st.sidebar.selectbox("목표", ["다이어트", "근육 증가", "건강 유지"])
-
-user_info = {
-    "age": age,
-    "gender": gender,
-    "height": height,
-    "weight": weight,
-    "allergies": allergies,
-    "health": health,
-    "goal": goal,
-}
 
 # -------------------- 권장 칼로리 계산 --------------------
 bmr = calculate_bmr(gender, weight, height, age)
@@ -99,7 +96,12 @@ st.markdown("### 🍽️ 오늘 하루 먹은 음식")
 meal_names = [f["name"] for f in foods]
 selected_meals = st.multiselect("음식 선택", meal_names)
 
+manual_meal = st.text_input("직접 입력한 음식 (칼로리 계산 X)", placeholder="예: 치킨, 짜장면")
+if manual_meal:
+    selected_meals.append(manual_meal.strip())
+
 if st.button("📊 칼로리 계산 및 저장"):
+    # 칼로리는 foods에 정의된 음식만 계산
     intake = sum(f["calories"] for f in foods if f["name"] in selected_meals)
     st.success(f"오늘 총 섭취 칼로리: {intake} kcal")
 
