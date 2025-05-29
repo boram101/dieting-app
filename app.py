@@ -44,7 +44,7 @@ def load_log():
 
 def save_log(log):
     with open("meals_log.json", "w") as f: 
- json.dump(log, f, ensure_ascii=False, indent=2)
+     json.dump(log, f, ensure_ascii=False, indent=2)
 
 #-------------------- 사용자 정보 입력 -------------------- 
 
