@@ -9,7 +9,7 @@ st.set_page_config(page_title="개인 맞춤 식단 설계 프로그램")
 st.title("🥗 개인 맞춤 식단 설계 프로그램")
 
 # -------------------- 기본 음식 데이터 -------------------- 
-foods = [
+default_foods = [
     {"name": "닭가슴살", "calories": 165, "protein": 31, "allergens": []},
     {"name": "현미밥", "calories": 220, "protein": 4, "allergens": []},
     {"name": "두부", "calories": 76, "protein": 8, "allergens": ["콩"]},
@@ -19,6 +19,18 @@ foods = [
     {"name": "오트밀", "calories": 150, "protein": 5, "allergens": []},
     {"name": "그릭요거트", "calories": 100, "protein": 10, "allergens": ["우유"]},
 ]
+
+# -------------------- 사용자 정의 음식 로드 -------------------- 
+if 'foods' not in st.session_state:
+    try:
+        with open("custom_foods.json", "r") as f:
+            custom_foods = json.load(f)
+    except:
+        custom_foods = []
+    st.session_state.foods = default_foods + custom_foods
+
+# foods 리스트는 항상 session_state 사용
+foods = st.session_state.foods
 
 # -------------------- BMR 계산 -------------------- 
 def calculate_bmr(gender, weight, height, age): 
@@ -93,12 +105,21 @@ with st.expander("🍱 음식 추가하기"):
     calculated_calories = carbs * 4 + protein * 4 + fats * 9
 
     if st.button("음식 추가"):
-        foods.append({
+        new_food = {
             "name": new_name,
             "calories": round(calculated_calories),
             "protein": protein,
             "allergens": new_allergens
-        })
+        }
+        st.session_state.foods.append(new_food)
+
+        # 사용자 정의 음식만 저장
+        basic_names = [f["name"] for f in default_foods]
+        custom_to_save = [f for f in st.session_state.foods if f["name"] not in basic_names]
+
+        with open("custom_foods.json", "w") as f:
+            json.dump(custom_to_save, f, ensure_ascii=False, indent=2)
+
         st.success(f"'{new_name}'이(가) 추가되었습니다! 칼로리: {round(calculated_calories)} kcal")
 
 # -------------------- 오늘 식단 입력 -------------------- 
@@ -179,32 +200,3 @@ if st.button("📌 하루 식단 추천받기"):
 
     total_day = cal_b + cal_l + cal_d
     st.success(f"✅ 하루 총 섭취: {total_day} kcal (권장: {int(calorie_goal)} kcal)")
-    
-    # 기존 코드 위에 추가
-if 'foods' not in st.session_state:
-    try:
-        with open("custom_foods.json", "r") as f:
-            custom_foods = json.load(f)
-    except:
-        custom_foods = []
-
-    st.session_state.foods = foods + custom_foods
-
-# 전체 foods 리스트는 session_state를 사용
-foods = st.session_state.foods
-
-if st.button("음식 추가"):
-    new_food = {
-        "name": new_name,
-        "calories": round(calculated_calories),
-        "protein": protein,
-        "allergens": new_allergens
-    }
-    st.session_state.foods.append(new_food)
-
-    # 저장
-    custom_foods = [f for f in st.session_state.foods if f["name"] not in [x["name"] for x in foods]]
-    with open("custom_foods.json", "w") as f:
-        json.dump(custom_foods, f, ensure_ascii=False, indent=2)
-
-    st.success(f"'{new_name}'이(가) 추가되었습니다! 칼로리: {round(calculated_calories)} kcal")
